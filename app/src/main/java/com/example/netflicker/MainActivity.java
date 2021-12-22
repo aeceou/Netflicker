@@ -28,15 +28,19 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     private ArrayList<MediaFiles> mediaFiles = new ArrayList<>();
-    private ArrayList<String> allFolderList = new ArrayList<>();
-    RecyclerView recyclerView;
-    VideoFoldersAdapter adapter;
-    SwipeRefreshLayout swipeRefreshLayout;
+    final ArrayList<String> allFolderList = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private VideoFoldersAdapter adapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        /* get permissions */
         if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
                 || checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
                 || checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED
@@ -49,52 +53,54 @@ public class MainActivity extends AppCompatActivity {
             intent.setData(uri);
             startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
         }
+
         recyclerView = findViewById(R.id.folders_rv);
-        swipeRefreshLayout = findViewById(R.id.swipe_refresh_folders);
         showFolders();
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
+        /* refresh */
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_folders);
+        swipeRefreshLayout.setOnRefreshListener(() -> {
                 showFolders();
                 swipeRefreshLayout.setRefreshing(false);
             }
-        });
+        );
     }
 
     private void showFolders() {
         mediaFiles = fetchMedia();
         adapter = new VideoFoldersAdapter(mediaFiles, allFolderList, this);
         recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this,
-                RecyclerView.VERTICAL, false));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
         adapter.notifyDataSetChanged();
     }
 
-    public ArrayList<MediaFiles> fetchMedia() {
+    private ArrayList<MediaFiles> fetchMedia() {
         ArrayList<MediaFiles> mediaFilesArrayList = new ArrayList<>();
         Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-
         Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-        if (cursor != null && cursor.moveToNext()) {
-            do {
-                @SuppressLint("Range") String id = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media._ID));
-                @SuppressLint("Range")String title = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE));
-                @SuppressLint("Range")String displayName = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME));
-                @SuppressLint("Range")String size = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.SIZE));
-                @SuppressLint("Range")String duration = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DURATION));
-                @SuppressLint("Range")String path = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA));
-                @SuppressLint("Range")String dateAdded = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED));
-                MediaFiles mediaFiles = new MediaFiles(id, title, displayName, size, duration, path, dateAdded);
-
-                int index = path.lastIndexOf("/");
-                String subString = path.substring(0, index);
-                if (!allFolderList.contains(subString)) {
-                    allFolderList.add(subString);
-                }
-                mediaFilesArrayList.add(mediaFiles);
-            } while (cursor.moveToNext());
+        /* read all media files */
+        try {
+            if (cursor != null && cursor.moveToNext()) {
+                do {
+                    @SuppressLint("Range") String id = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media._ID));
+                    @SuppressLint("Range") String title = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.TITLE));
+                    @SuppressLint("Range") String displayName = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME));
+                    @SuppressLint("Range") String size = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.SIZE));
+                    @SuppressLint("Range") String duration = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DURATION));
+                    @SuppressLint("Range") String path = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA));
+                    @SuppressLint("Range") String dateAdded = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATE_ADDED));
+                    MediaFiles mediaFiles = new MediaFiles(id, title, displayName, size, duration, path, dateAdded);
+                    /* add directories to 'allFolderList' */
+                    int index = path.lastIndexOf("/");
+                    String subString = path.substring(0, index);
+                    if (!allFolderList.contains(subString)) {
+                        allFolderList.add(subString);
+                    }
+                    mediaFilesArrayList.add(mediaFiles);
+                } while (cursor.moveToNext());
+            }
+        } finally {
+            if (cursor != null) { cursor.close(); }
         }
-
         return mediaFilesArrayList;
     }
 
