@@ -2,9 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/rateus"
-        android:title="RateUs"
+    <item android:id="@+id/user_vocab"
+        android:title="User Vocabulary"
+        android:icon="@drawable/ic_user_vocab"
+        app:showAsAction="ifRoom" />
+    <item android:id="@+id/new_vocab"
+        android:title="New Vocabulary"
         android:icon="@drawable/ic_round_star_rate_24"
+        app:showAsAction="ifRoom" />
+    <item android:id="@+id/new_movie"
+        android:title="New Movie"
+        android:icon="@drawable/ic_new_movie"
         app:showAsAction="ifRoom" />
     <item android:id="@+id/refresh_folders"
         android:title="Refresh"
