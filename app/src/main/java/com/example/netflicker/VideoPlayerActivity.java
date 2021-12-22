@@ -1,6 +1,7 @@
 package com.example.netflicker;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,6 +46,7 @@ import com.google.android.exoplayer2.util.Util;
 import com.google.common.io.LineReader;
 
 import java.io.File;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 public class VideoPlayerActivity extends AppCompatActivity implements View.OnClickListener {
@@ -55,6 +57,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
     int position;
     String videoTitle;
     TextView title;
+    int userLevel = 0;
     private ControlsMode controlsMode;
     public enum ControlsMode {
         LOCK,FULLSCREEN;
@@ -66,7 +69,6 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
     private ArrayList<IconModel> iconModelArrayList = new ArrayList<>();
     PlaybackIconsAdapter playbackIconsAdapter;
     RecyclerView recyclerViewIcons;
-    boolean expand = false;
     PlaybackParameters parameters;
     DialogProperties dialogProperties;
     FilePickerDialog filePickerDialog;
@@ -106,9 +108,15 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
         filePickerDialog.setPositiveBtnName("OK");
         filePickerDialog.setNegativeBtnName("Cancel");
 
+        //userLevelChoiceDialogFragment = new UserLevelChoiceDialogFragment(new WeakReference<VideoPlayerActivity>(this));
+
         //iconModelArrayList.add(new IconModel(R.drawable.ic_right, ""));
         iconModelArrayList.add(new IconModel(R.drawable.ic_rotate, "Rotate"));
         iconModelArrayList.add(new IconModel(R.drawable.ic_subtitle, "Subtitle"));
+        iconModelArrayList.add(new IconModel(R.drawable.ic_level_0, "Novice"));
+        iconModelArrayList.add(new IconModel(R.drawable.ic_level_1, "Intermediate"));
+        iconModelArrayList.add(new IconModel(R.drawable.ic_level_2, "Advanced"));
+        iconModelArrayList.add(new IconModel(R.drawable.ic_level_3, "Native"));
 
         playbackIconsAdapter = new PlaybackIconsAdapter(iconModelArrayList, this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this,
@@ -145,6 +153,26 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
                             playVideoSubtitle(uriSubtitle);
                         }
                     });
+                }
+                if (position == 2) {
+                    userLevel = 0;
+                    Toast.makeText(VideoPlayerActivity.this, "Level: Novice", Toast.LENGTH_SHORT).show();
+                    playbackIconsAdapter.notifyDataSetChanged();
+                }
+                if (position == 3) {
+                    userLevel = 1;
+                    Toast.makeText(VideoPlayerActivity.this, "Level: Intermediate", Toast.LENGTH_SHORT).show();
+                    playbackIconsAdapter.notifyDataSetChanged();
+                }
+                if (position == 4) {
+                    userLevel = 2;
+                    Toast.makeText(VideoPlayerActivity.this, "Level: Advanced", Toast.LENGTH_SHORT).show();
+                    playbackIconsAdapter.notifyDataSetChanged();
+                }
+                if (position == 5) {
+                    userLevel = 3;
+                    Toast.makeText(VideoPlayerActivity.this, "Level: Native", Toast.LENGTH_SHORT).show();
+                    playbackIconsAdapter.notifyDataSetChanged();
                 }
 
             }

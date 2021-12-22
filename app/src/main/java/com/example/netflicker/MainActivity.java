@@ -114,10 +114,21 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
         switch (id) {
+            /*
             case R.id.rateus:
                 Uri uri = Uri.parse("https://play.google.com/store/apps/details?id="+getApplicationContext().getPackageName());
                 Intent intent = new Intent(Intent.ACTION_VIEW, uri);
                 startActivity(intent);
+                break;
+
+             */
+            case R.id.user_vocab:
+                Intent intent = new Intent(this, UserVocabActivity.class);
+                startActivity(intent);
+                break;
+            case R.id.new_vocab:
+                break;
+            case R.id.new_movie:
                 break;
             case R.id.refresh_folders:
                 finish();
