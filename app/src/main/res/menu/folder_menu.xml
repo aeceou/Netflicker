@@ -2,15 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/user_vocab"
+    <item android:id="@+id/user_vocab_item"
         android:title="User Vocabulary"
         android:icon="@drawable/ic_user_vocab"
         app:showAsAction="ifRoom" />
-    <item android:id="@+id/new_vocab"
+    <item android:id="@+id/new_vocab_item"
         android:title="New Vocabulary"
         android:icon="@drawable/ic_round_star_rate_24"
         app:showAsAction="ifRoom" />
-    <item android:id="@+id/new_movie"
+    <item android:id="@+id/new_movie_item"
         android:title="New Movie"
         android:icon="@drawable/ic_new_movie"
         app:showAsAction="ifRoom" />

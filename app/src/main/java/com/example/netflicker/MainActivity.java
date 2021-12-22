@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -122,13 +123,17 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
              */
-            case R.id.user_vocab:
-                Intent intent = new Intent(this, UserVocabActivity.class);
-                startActivity(intent);
+            case R.id.user_vocab_item:
+                Log.v("20202989", "user_vocab_item");
+                Intent user_vocab_intent = new Intent(this, UserVocabActivity.class);
+                startActivity(user_vocab_intent);
                 break;
-            case R.id.new_vocab:
+            case R.id.new_vocab_item:
                 break;
-            case R.id.new_movie:
+            case R.id.new_movie_item:
+                Log.v("20202989", "new_movie_item");
+                Intent new_movie_intent = new Intent(this, NewMovieActivity.class);
+                startActivity(new_movie_intent);
                 break;
             case R.id.refresh_folders:
                 finish();

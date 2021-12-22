@@ -17,10 +17,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Netflicker">
         <activity
-            android:name=".UserVocabActivity"
-            android:theme="@style/Theme.AppCompat"
-            android:exported="true" />
-        <activity
             android:name=".VideoPlayerActivity"
             android:theme="@style/Theme.AppCompat"
             android:exported="true"
@@ -36,6 +32,16 @@
         <activity
             android:name=".MainActivity"
             android:theme="@style/Theme.AppCompat"
+            android:exported="true" />
+        <activity
+            android:name=".NewMovieActivity"
+            android:theme="@style/Theme.AppCompat"
+            android:parentActivityName=".MainActivity"
+            android:exported="true" />
+        <activity
+            android:name=".UserVocabActivity"
+            android:theme="@style/Theme.AppCompat"
+            android:parentActivityName=".MainActivity"
             android:exported="true" />
         <activity
             android:name=".SplashScreenActivity"
