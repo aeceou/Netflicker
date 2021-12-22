@@ -181,6 +181,7 @@
             android:maxHeight="80dp">
 
             <TextView
+                android:id="@+id/recommended_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="60dp"

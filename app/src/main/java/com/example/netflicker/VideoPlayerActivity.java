@@ -1,15 +1,12 @@
 package com.example.netflicker;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Icon;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,11 +15,17 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.RequestQueue;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.android.volley.Request;
+import com.android.volley.Response;
 import com.developer.filepicker.controller.DialogSelectionListener;
 import com.developer.filepicker.model.DialogConfigs;
 import com.developer.filepicker.model.DialogProperties;
@@ -38,16 +41,26 @@ import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.MergingMediaSource;
 import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.SingleSampleMediaSource;
+import com.google.android.exoplayer2.text.Cue;
+import com.google.android.exoplayer2.text.TextOutput;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
-import com.google.common.io.LineReader;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.HashMap;
+
+import org.json.JSONObject;
+import org.json.JSONException;
 
 public class VideoPlayerActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -59,6 +72,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
     TextView title;
     int userLevel = 0;
     private ControlsMode controlsMode;
+
     public enum ControlsMode {
         LOCK,FULLSCREEN;
     }
@@ -73,6 +87,8 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
     DialogProperties dialogProperties;
     FilePickerDialog filePickerDialog;
     Uri uriSubtitle;
+    List<Integer> difficulties;
+    boolean postResponse = false;
 
     //horizontal recyclerview variables
     @Override
@@ -229,8 +245,8 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
         //player.setPlaybackParameters(parameters);
         player.prepare(concatenatingMediaSource);
         player.seekTo(position, oldPosition);
+        onCues();
         playError();
-
     }
 
     private void screenOrientation() {
@@ -358,4 +374,78 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
             scaling.setOnClickListener(firstListener);
         }
     };
+
+    private void onCues() {
+        RequestQueue requests = Volley.newRequestQueue(this);
+        HashMap<String, Object> requestMap = new HashMap<>();
+        requestMap.put("aim", "difficulties");
+        String URL = "http://solar.postech.ac.kr:9000/recommender";
+        player.addTextOutput(new TextOutput() {
+            @Override
+            public void onCues(List<Cue> cues) {
+                if (cues.size() > 0) {
+                    Cue currentCue = cues.get(0);
+                    String currentText = currentCue.text.toString();
+                    ArrayList<String> words = new ArrayList<String>(Arrays.asList(currentText.split("\\s")));
+                    int c = 0;
+                    int wordsLength = words.size();
+                    while (c < wordsLength) {
+                        if (Pattern.matches("^[a-zA-Z]*$", words.get(c))) {
+                            c++;
+                        } else {
+                            words.remove(c);
+                            wordsLength--;
+                        }
+                    }
+                    if (words.size() > 0 && !postResponse) {
+                        requestMap.put("data", words);
+                        JSONObject requestData = new JSONObject(requestMap);
+                        getResponse(requests, URL, requestData, words);
+                    }
+                }
+            }
+        });
+        player.setPlayWhenReady(true);
+    }
+
+    private void getResponse(RequestQueue requests, String URL, JSONObject requestData, ArrayList<String> query) {
+        JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, URL, requestData, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                try {
+                    postResponse = true;
+                    List<Integer> result = new ArrayList<Integer>();
+                    Iterator<String> keyItr = response.keys();
+                    while(keyItr.hasNext()) {
+                        String key = keyItr.next();
+                        result.add(response.getInt(key));
+                    }
+                    int maxDifficulty = Collections.max(result);
+                    int wordIdx = result.indexOf(maxDifficulty);
+                    String difficultWord = query.get(wordIdx);
+                    TextView recommendedText = findViewById(R.id.recommended_text);
+                    recommendedText.setText(difficultWord);
+                    postResponse = false;
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                requests.start();
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> map = new HashMap<>();
+                map.put("Content-Type", "application/json");
+                map.put("Accept", "application/json");
+                return map;
+            }
+        };
+        requests.add(jsonRequest);
+    }
+
 }
