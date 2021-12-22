@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -50,6 +51,8 @@ import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -59,6 +62,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
@@ -89,6 +93,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
     Uri uriSubtitle;
     List<Integer> difficulties;
     boolean postResponse = false;
+    ArrayList<String> vocab = new ArrayList<>();
 
     //horizontal recyclerview variables
     @Override
@@ -405,6 +410,30 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
                 }
             }
         });
+        player.addListener(new Player.EventListener() {
+            @Override
+            public void onIsPlayingChanged(boolean isPlaying) {
+                if (!isPlaying) {
+                    Context context = getApplicationContext();
+                    File dir = new File(context.getFilesDir(), "mydir");
+                    if(!dir.exists()){
+                        dir.mkdir();
+                    }
+                    File _file = new File(dir, "user_vocab.json");
+                    try {
+                        FileWriter file = new FileWriter(_file);
+                        if (vocab == null) {
+
+                            vocab.add("");
+                        }
+                        JSONArray jsonVocab = new JSONArray(vocab);
+                        file.write(jsonVocab.toString());
+                        file.flush();
+                        file.close();
+                    } catch (IOException e) { e.printStackTrace(); }
+                }
+            }
+        });
         player.setPlayWhenReady(true);
     }
 
@@ -420,11 +449,24 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
                         String key = keyItr.next();
                         result.add(response.getInt(key));
                     }
-                    int maxDifficulty = Collections.max(result);
-                    int wordIdx = result.indexOf(maxDifficulty);
-                    String difficultWord = query.get(wordIdx);
-                    TextView recommendedText = findViewById(R.id.recommended_text);
-                    recommendedText.setText(difficultWord);
+                    int c = 0;
+                    int resultLength = result.size();
+                    while (c < resultLength) {
+                        if (result.get(c) < userLevel) {
+                            result.remove(c);
+                            resultLength--;
+                        } else {
+                            c++;
+                        }
+                    }
+                    if (result.size() > 0) {
+                        int maxDifficulty = Collections.max(result);
+                        int wordIdx = result.indexOf(maxDifficulty);
+                        String difficultWord = query.get(wordIdx);
+                        TextView recommendedText = findViewById(R.id.recommended_text);
+                        recommendedText.setText(difficultWord);
+                        vocab.add(difficultWord);
+                    }
                     postResponse = false;
                 } catch (JSONException e) {
                     e.printStackTrace();
