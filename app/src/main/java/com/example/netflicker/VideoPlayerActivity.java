@@ -111,12 +111,12 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
         //userLevelChoiceDialogFragment = new UserLevelChoiceDialogFragment(new WeakReference<VideoPlayerActivity>(this));
 
         //iconModelArrayList.add(new IconModel(R.drawable.ic_right, ""));
-        iconModelArrayList.add(new IconModel(R.drawable.ic_rotate, "Rotate"));
-        iconModelArrayList.add(new IconModel(R.drawable.ic_subtitle, "Subtitle"));
         iconModelArrayList.add(new IconModel(R.drawable.ic_level_0, "Novice"));
         iconModelArrayList.add(new IconModel(R.drawable.ic_level_1, "Intermediate"));
         iconModelArrayList.add(new IconModel(R.drawable.ic_level_2, "Advanced"));
         iconModelArrayList.add(new IconModel(R.drawable.ic_level_3, "Native"));
+        iconModelArrayList.add(new IconModel(R.drawable.ic_rotate, "Rotate"));
+        iconModelArrayList.add(new IconModel(R.drawable.ic_subtitle, "Subtitle"));
 
         playbackIconsAdapter = new PlaybackIconsAdapter(iconModelArrayList, this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this,
@@ -128,6 +128,26 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onItemClick(int position) {
                 if (position == 0) {
+                    userLevel = 0;
+                    Toast.makeText(VideoPlayerActivity.this, "Level: Novice", Toast.LENGTH_SHORT).show();
+                    playbackIconsAdapter.notifyDataSetChanged();
+                }
+                if (position == 1) {
+                    userLevel = 1;
+                    Toast.makeText(VideoPlayerActivity.this, "Level: Intermediate", Toast.LENGTH_SHORT).show();
+                    playbackIconsAdapter.notifyDataSetChanged();
+                }
+                if (position == 2) {
+                    userLevel = 2;
+                    Toast.makeText(VideoPlayerActivity.this, "Level: Advanced", Toast.LENGTH_SHORT).show();
+                    playbackIconsAdapter.notifyDataSetChanged();
+                }
+                if (position == 3) {
+                    userLevel = 3;
+                    Toast.makeText(VideoPlayerActivity.this, "Level: Native", Toast.LENGTH_SHORT).show();
+                    playbackIconsAdapter.notifyDataSetChanged();
+                }
+                if (position == 4) {
                     if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                         playbackIconsAdapter.notifyDataSetChanged();
@@ -136,7 +156,8 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
                         playbackIconsAdapter.notifyDataSetChanged();
                     }
                 }
-                if (position == 1) {
+
+                if (position == 5) {
                     dialogProperties.selection_mode = DialogConfigs.SINGLE_MODE;
                     dialogProperties.extensions = new String[]{".srt"};
                     dialogProperties.root = new File("/storage/emulated/0");
@@ -154,27 +175,6 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
                         }
                     });
                 }
-                if (position == 2) {
-                    userLevel = 0;
-                    Toast.makeText(VideoPlayerActivity.this, "Level: Novice", Toast.LENGTH_SHORT).show();
-                    playbackIconsAdapter.notifyDataSetChanged();
-                }
-                if (position == 3) {
-                    userLevel = 1;
-                    Toast.makeText(VideoPlayerActivity.this, "Level: Intermediate", Toast.LENGTH_SHORT).show();
-                    playbackIconsAdapter.notifyDataSetChanged();
-                }
-                if (position == 4) {
-                    userLevel = 2;
-                    Toast.makeText(VideoPlayerActivity.this, "Level: Advanced", Toast.LENGTH_SHORT).show();
-                    playbackIconsAdapter.notifyDataSetChanged();
-                }
-                if (position == 5) {
-                    userLevel = 3;
-                    Toast.makeText(VideoPlayerActivity.this, "Level: Native", Toast.LENGTH_SHORT).show();
-                    playbackIconsAdapter.notifyDataSetChanged();
-                }
-
             }
         });
 
