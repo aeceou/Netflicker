@@ -38,11 +38,13 @@ public class VideoFilesActivity extends AppCompatActivity {
     }
 
     private ArrayList<MediaFiles> fetchMedia(String folderName) {
+
         ArrayList<MediaFiles> videoFiles = new ArrayList<>();
         Uri uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
         String selection = MediaStore.Video.Media.DATA+" like?";
         String[] selectionArg = new String[]{"%"+folderName+"%"};
         Cursor cursor = getContentResolver().query(uri, null, selection, selectionArg, null);
+
         if (cursor != null && cursor.moveToNext()) {
             do {
                 @SuppressLint("Range") String id = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media._ID));
@@ -56,6 +58,7 @@ public class VideoFilesActivity extends AppCompatActivity {
                 videoFiles.add(mediaFiles);
             } while (cursor.moveToNext());
         }
+
         return videoFiles;
 
     }
