@@ -16,9 +16,5 @@
             android:layout_height="match_parent"
             android:id="@+id/folders_rv" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-    <androidx.recyclerview.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/folders_rv" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

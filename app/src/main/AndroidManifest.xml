@@ -19,7 +19,8 @@
         <activity
             android:name=".VideoPlayerActivity"
             android:theme="@style/Theme.AppCompat"
-            android:exported="true" />
+            android:exported="true"
+            android:configChanges="orientation|screenSize|layoutDirection"/>
         <activity
             android:name=".VideoFilesActivity"
             android:theme="@style/Theme.AppCompat"
